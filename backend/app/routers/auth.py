@@ -6,7 +6,7 @@ from sqlalchemy import select, or_
 from app.database import get_db
 from app.models.user import User, UserRole, UserStatus
 from app.models.organization import Organization
-from app.schemas.auth import RegisterRequest, LoginRequest, TokenResponse
+from app.schemas.auth import RegisterRequest, TokenResponse
 from app.schemas.user import UserOut, UserApprovalRequest
 from app.services.auth_service import (
     get_password_hash,
