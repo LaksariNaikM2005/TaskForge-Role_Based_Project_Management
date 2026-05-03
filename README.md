@@ -71,6 +71,7 @@ pip install -r backend/requirements.txt
 cd backend
 python -m uvicorn app.main:app --reload --port 8000
 ```
+
 *Backend runs at: [http://localhost:8000](http://localhost:8000)*  
 *Swagger API Docs: [http://localhost:8000/docs](http://localhost:8000/docs)*
 
@@ -81,6 +82,7 @@ cd frontend
 npm install
 npm run dev
 ```
+
 *Frontend runs at: [http://localhost:5173](http://localhost:5173)*
 
 ### 3. Machine Learning Models Setup
@@ -117,12 +119,14 @@ FRONTEND_URL=http://localhost:5173
 ## 🚢 Deployment (Railway)
 
 ### Backend Deployment
+
 1. Create a new Railway project and choose **Deploy from GitHub**.
 2. Add a **PostgreSQL** database service (auto-injects `DATABASE_URL`).
 3. Set the required environment variables (`SECRET_KEY`, `FRONTEND_URL`).
 4. Railway will automatically detect the `Dockerfile` and deploy.
 
 ### Frontend Deployment
+
 1. Create a **New Service → Static Site** in Railway.
 2. Set Root Directory to `frontend/`.
 3. Build Command: `npm install && npm run build`
@@ -134,14 +138,17 @@ FRONTEND_URL=http://localhost:5173
 ## 📋 Core API Endpoints
 
 ### Authentication & Organization
+
 - `POST /api/auth/register` - Secure user registration/referral flow.
 - `POST /api/auth/login` - Authenticate and retrieve JWT token.
 - `POST /api/organization` - Manage enterprise organization structure.
 
 ### Tasks & Machine Learning
+
 - `GET/POST/PUT/DELETE /api/tasks` - CRUD operations for hierarchical tasks.
 - `POST /api/ml/predict-priority` - ML model predicts task priority.
 - `POST /api/ml/predict-assignment` - ML model predicts optimal target department and role.
 
 ### Collaboration
+
 - `WS /ws/{project_id}` - WebSocket for real-time messaging and events.
