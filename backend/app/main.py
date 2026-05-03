@@ -88,10 +88,16 @@ if os.path.exists("dist"):
     # Catch-all for SPA routing (must be at the end)
     @app.get("/{full_path:path}")
     async def serve_frontend(full_path: str):
-        # Prevent shadowing API routes (though they should be matched first)
+        # Prevent shadowing API routes
         if full_path.startswith("api") or full_path.startswith("ws"):
             return JSONResponse(status_code=404, content={"detail": "Not Found"})
             
+        # Check if the file exists in dist
+        file_path = os.path.join("dist", full_path)
+        if os.path.isfile(file_path):
+            return FileResponse(file_path)
+            
+        # Fallback to index.html for SPA routing
         index_path = os.path.join("dist", "index.html")
         if os.path.exists(index_path):
             return FileResponse(index_path)
