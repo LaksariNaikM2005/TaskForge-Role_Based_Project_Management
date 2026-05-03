@@ -1,6 +1,14 @@
-# ── TaskForge Backend – Railway Dockerfile ──────────────────────────────
-FROM python:3.10-slim
+# ── Stage 1: Build Frontend ──────────────────────────────────────────
+FROM node:20-slim AS frontend-build
+WORKDIR /frontend
+COPY frontend/package*.json ./
+RUN npm install
+COPY frontend/ .
+ENV VITE_API_URL=""
+RUN npm run build
 
+# ── Stage 2: Build Backend ───────────────────────────────────────────
+FROM python:3.10-slim
 WORKDIR /app
 
 ENV PYTHONDONTWRITEBYTECODE=1
@@ -13,8 +21,11 @@ RUN apt-get update && apt-get install -y gcc libpq-dev && rm -rf /var/lib/apt/li
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy backend source into /app so `app.main` is importable
+# Copy backend source
 COPY backend/ .
+
+# Copy built frontend from Stage 1
+COPY --from=frontend-build /frontend/dist ./dist
 
 EXPOSE 8000
 

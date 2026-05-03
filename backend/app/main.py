@@ -1,7 +1,9 @@
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, FileResponse
+from fastapi.staticfiles import StaticFiles
+import os
 
 from app.config import settings
 from app.database import engine, Base
@@ -73,11 +75,28 @@ app.include_router(ws.router)
 app.include_router(ml.router, prefix="/api/ml", tags=["ML"])
 
 
-@app.get("/")
-async def root():
-    return {"message": "TaskForge API v2 is running", "docs": "/docs"}
-
-
 @app.get("/health")
 async def health():
     return {"status": "healthy"}
+
+
+# ── Serve Frontend Static Files ──────────────────────────────────────
+# Mount static files (JS, CSS, images)
+if os.path.exists("dist"):
+    app.mount("/assets", StaticFiles(directory="dist/assets"), name="assets")
+
+    # Catch-all for SPA routing (must be at the end)
+    @app.get("/{full_path:path}")
+    async def serve_frontend(full_path: str):
+        # Prevent shadowing API routes (though they should be matched first)
+        if full_path.startswith("api") or full_path.startswith("ws"):
+            return JSONResponse(status_code=404, content={"detail": "Not Found"})
+            
+        index_path = os.path.join("dist", "index.html")
+        if os.path.exists(index_path):
+            return FileResponse(index_path)
+        return JSONResponse(status_code=404, content={"detail": "Frontend build not found"})
+else:
+    @app.get("/")
+    async def root():
+        return {"message": "TaskForge API v2 is running", "docs": "/docs"}
